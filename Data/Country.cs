@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace HoteListing.Api.Data;
 
 public class Country

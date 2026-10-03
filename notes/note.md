@@ -16,3 +16,11 @@ getting Image:
 
 
 scafolding: scafolding is a code generation technique.
+
+DTO: Data shaping.
+ - Return only relevent data in Response.
+ - Minimize payload for performance
+ - Avoid leaking sensitive fields.
+ - Achivie using mapping or projecting(e.g LINQ Select)
+
+-  Optionally use a mapper to map between DTOs and domain models.
