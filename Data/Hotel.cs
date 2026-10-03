@@ -9,5 +9,5 @@ public class Hotel
     public string Address {get; set;}
     public int CountryId {get; set;}
     public Country? Country {get; set;} // Navigation property to represent the relationship with countries
-
+    public string Rating { get; set; }
 }
