@@ -1,4 +1,5 @@
 using HoteListing.Api.Data;
+using HoteListing.Api.DTOs.Hotel;
 using HotelListing.Api.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,29 +26,50 @@ namespace HotelListing.Api.Controllers
 
         // GET: api/Countries/5
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<Country>> GetCountry(int id)
+        public async Task<ActionResult<GetCountryDto>> GetCountry(int id)
         {
-            var country = await _context.Countries.FindAsync(id);
+            var country = await _context
+                .Countries.Where(c => c.CountryId == id)
+                .Select(c => new GetCountryDto(
+                    c.CountryId,
+                    c.Name,
+                    c.ShortName,
+                    c.Hotels.Select(h => new HoteListing.Api.DTOs.Hotel.GetHotelSlimDto(
+                            h.Id,
+                            h.Name,
+                            h.Address,
+                            h.Rating
+                        ))
+                        .ToList()
+                ))
+                .FirstOrDefaultAsync();
 
             if (country is null)
             {
                 return NotFound();
             }
 
-            return country;
+            return Ok(country);
         }
 
         // POST: api/Countries
+        // POST: api/Countries
         [HttpPost]
-        public async Task<ActionResult<Country>> PostCountry(Country country)
+        public async Task<ActionResult<GetCountryDto>> PostCountry(CreateCountryDto countryDto)
         {
+            var country = new Country { Name = countryDto.Name, ShortName = countryDto.ShortName };
+
             _context.Countries.Add(country);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(
-                nameof(GetCountry),
-                new { id = country.CountryId },
-                country);
+            var resultDto = new GetCountryDto(
+                Id: country.CountryId,
+                Name: country.Name,
+                ShortName: country.ShortName, 
+                Hotels: []
+            );
+
+            return CreatedAtAction(nameof(GetCountry), new { id = country.CountryId }, resultDto);
         }
 
         // PUT: api/Countries/5
