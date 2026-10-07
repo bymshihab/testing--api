@@ -24,3 +24,9 @@ DTO: Data shaping.
  - Achivie using mapping or projecting(e.g LINQ Select)
 
 -  Optionally use a mapper to map between DTOs and domain models.
+
+Next Course:
+- solid and clean architecture course
+- Entity framework course
+
+
