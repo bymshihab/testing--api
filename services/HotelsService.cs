@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.Api.Services;
 
-public class HotelsService(HotelListingDbContext context, IMapper mapper) : IHotelsService
+public class HotelsService(HotelListingDbContext context, CountriesService countriesService, IMapper mapper) : IHotelsService
 {
     public async Task<Result<IEnumerable<GetHotelsDto>>> GetHotelsAsync()
     {
@@ -30,7 +30,7 @@ public class HotelsService(HotelListingDbContext context, IMapper mapper) : IHot
 
     public async Task<Result<GetHotelDto>> CreateHotelAsync(CreateHotelDto hotelDto)
     {
-        if (!await context.Countries.AnyAsync(country => country.CountryId == hotelDto.CountryId))
+        if (!await countriesService.CountryExistsAsync(hotelDto.CountryId))
         {
             return Result<GetHotelDto>.Failure(new Error("BadRequest", $"Country {hotelDto.CountryId} was not found."));
         }
@@ -50,7 +50,7 @@ public class HotelsService(HotelListingDbContext context, IMapper mapper) : IHot
             return Result<bool>.NotFound(new Error("NotFound", $"Hotel {id} was not found."));
         }
 
-        if (!await context.Countries.AnyAsync(country => country.CountryId == hotelDto.CountryId))
+        if (!await countriesService.CountryExistsAsync(hotelDto.CountryId))
         {
             return Result<bool>.Failure(new Error("BadRequest", $"Country {hotelDto.CountryId} was not found."));
         }

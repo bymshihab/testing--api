@@ -61,4 +61,9 @@ public class CountriesService(HotelListingDbContext context, IMapper mapper) : I
         await context.SaveChangesAsync();
         return Result<bool>.Success(true);
     }
+
+    public async Task<bool> CountryExistsAsync(int id)
+    {
+        return await context.Countries.AnyAsync(country => country.CountryId == id);
+    }
 }
