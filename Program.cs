@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<HotelListingDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("HotelListingDb"))
+    options.UseSqlite(builder.Configuration.GetConnectionString("HotelListingDb"))
 );
 
 builder
@@ -25,7 +25,8 @@ builder
             .IgnoreCycles;
     });
 
-builder.Services.AddScoped<ICountriesService, CountriesService>(); //
+builder.Services.AddScoped<CountriesService>();
+builder.Services.AddScoped<ICountriesService>(provider => provider.GetRequiredService<CountriesService>());
 builder.Services.AddScoped<IHotelsService, HotelsService>();
 builder.Services.AddTransient<CountryNameResolver>();
 

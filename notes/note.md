@@ -29,4 +29,7 @@ Next Course:
 - solid and clean architecture course
 - Entity framework course
 
-
+```
+dotnet restore
+dotnet run --launch-profile http
+```

@@ -211,3 +211,12 @@
 /tmp/hotelresolver-build/HotelListing.Api.runtimeconfig.json
 /tmp/hotelresolver-build/HotelListing.Api.dll
 /tmp/hotelresolver-build/HotelListing.Api.pdb
+/tmp/hotelrun-build/appsettings.Development.json
+/tmp/hotelrun-build/appsettings.json
+/tmp/hotelrun-build/dotnet-tools.json
+/tmp/hotelrun-build/HotelListing.Api.staticwebassets.endpoints.json
+/tmp/hotelrun-build/HotelListing.Api
+/tmp/hotelrun-build/HotelListing.Api.deps.json
+/tmp/hotelrun-build/HotelListing.Api.runtimeconfig.json
+/tmp/hotelrun-build/HotelListing.Api.dll
+/tmp/hotelrun-build/HotelListing.Api.pdb
