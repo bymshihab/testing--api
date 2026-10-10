@@ -31,8 +31,8 @@ public class HotelsService(HotelListingDbContext context, IMapper mapper) : IHot
 
         context.Hotels.Add(hotel);
         await context.SaveChangesAsync();
-
-        return (await GetHotelAsync(hotel.Id))!;
+        var returnObj = mapper.Map<GetHotelDto>(hotel);
+        return returnObj;
     }
 
     public async Task<bool> UpdateHotelAsync(int id, UpdateHotelDto hotelDto)
