@@ -1,4 +1,5 @@
 using HotelListing.Api.Contracts;
+using HotelListing.Api.Results;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelListing.Api.Controllers;
@@ -10,21 +11,24 @@ public class CountriesController(ICountriesService countriesService) : Controlle
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetCountriesDto>>> GetCountries()
     {
-        return Ok(await countriesService.GetCountriesAsync());
+        var result = await countriesService.GetCountriesAsync();
+        return result.IsSuccess ? Ok(result.Value) : result.ToErrorResponse(this);
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<GetCountryDto>> GetCountry(int id)
     {
-        var country = await countriesService.GetCountryAsync(id);
-        return country is null ? NotFound() : Ok(country);
+        var result = await countriesService.GetCountryAsync(id);
+        return result.IsSuccess ? Ok(result.Value) : result.ToErrorResponse(this);
     }
 
     [HttpPost]
     public async Task<ActionResult<GetCountryDto>> PostCountry(CreateCountryDto countryDto)
     {
-        var country = await countriesService.CreateCountryAsync(countryDto);
-        return CreatedAtAction(nameof(GetCountry), new { id = country.Id }, country);
+        var result = await countriesService.CreateCountryAsync(countryDto);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetCountry), new { id = result.Value!.Id }, result.Value)
+            : result.ToErrorResponse(this);
     }
 
     [HttpPut("{id:int}")]
@@ -32,19 +36,17 @@ public class CountriesController(ICountriesService countriesService) : Controlle
     {
         if (id != countryDto.CountryId)
         {
-            return BadRequest();
+            return BadRequest(new[] { new Error("BadRequest", "Route ID must match country ID.") });
         }
 
-        return await countriesService.UpdateCountryAsync(id, countryDto)
-            ? NoContent()
-            : NotFound();
+        var result = await countriesService.UpdateCountryAsync(id, countryDto);
+        return result.IsSuccess ? NoContent() : result.ToErrorResponse(this);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteCountry(int id)
     {
-        return await countriesService.DeleteCountryAsync(id)
-            ? NoContent()
-            : NotFound();
+        var result = await countriesService.DeleteCountryAsync(id);
+        return result.IsSuccess ? NoContent() : result.ToErrorResponse(this);
     }
 }

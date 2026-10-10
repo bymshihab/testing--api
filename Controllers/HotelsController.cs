@@ -1,5 +1,6 @@
 using HoteListing.Api.DTOs.Hotel;
 using HotelListing.Api.Contracts;
+using HotelListing.Api.Results;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelListing.Api.Controllers;
@@ -11,21 +12,24 @@ public class HotelsController(IHotelsService hotelsService) : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetHotelsDto>>> GetHotels()
     {
-        return Ok(await hotelsService.GetHotelsAsync());
+        var result = await hotelsService.GetHotelsAsync();
+        return result.IsSuccess ? Ok(result.Value) : result.ToErrorResponse(this);
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<GetHotelDto>> GetHotel(int id)
     {
-        var hotel = await hotelsService.GetHotelAsync(id);
-        return hotel is null ? NotFound() : Ok(hotel);
+        var result = await hotelsService.GetHotelAsync(id);
+        return result.IsSuccess ? Ok(result.Value) : result.ToErrorResponse(this);
     }
 
     [HttpPost]
     public async Task<ActionResult<GetHotelDto>> PostHotel(CreateHotelDto hotelDto)
     {
-        var hotel = await hotelsService.CreateHotelAsync(hotelDto);
-        return CreatedAtAction(nameof(GetHotel), new { id = hotel.Id }, hotel);
+        var result = await hotelsService.CreateHotelAsync(hotelDto);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetHotel), new { id = result.Value!.Id }, result.Value)
+            : result.ToErrorResponse(this);
     }
 
     [HttpPut("{id:int}")]
@@ -33,19 +37,17 @@ public class HotelsController(IHotelsService hotelsService) : ControllerBase
     {
         if (id != hotelDto.Id)
         {
-            return BadRequest();
+            return BadRequest(new[] { new Error("BadRequest", "Route ID must match hotel ID.") });
         }
 
-        return await hotelsService.UpdateHotelAsync(id, hotelDto)
-            ? NoContent()
-            : NotFound();
+        var result = await hotelsService.UpdateHotelAsync(id, hotelDto);
+        return result.IsSuccess ? NoContent() : result.ToErrorResponse(this);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteHotel(int id)
     {
-        return await hotelsService.DeleteHotelAsync(id)
-            ? NoContent()
-            : NotFound();
+        var result = await hotelsService.DeleteHotelAsync(id);
+        return result.IsSuccess ? NoContent() : result.ToErrorResponse(this);
     }
 }
