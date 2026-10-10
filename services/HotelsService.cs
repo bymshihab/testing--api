@@ -1,3 +1,4 @@
+using AutoMapper;
 using HoteListing.Api.Data;
 using HoteListing.Api.DTOs.Hotel;
 using HotelListing.Api.Contracts;
@@ -6,37 +7,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.Api.Services;
 
-public class HotelsService(HotelListingDbContext context) : IHotelsService
+public class HotelsService(HotelListingDbContext context, IMapper mapper) : IHotelsService
 {
     public async Task<IEnumerable<GetHotelsDto>> GetHotelsAsync()
     {
-        return await context.Hotels
-            .AsNoTracking()
-            .Select(hotel => new GetHotelsDto(
-                hotel.Id, hotel.Name!, hotel.Address, hotel.Rating, hotel.CountryId))
-            .ToListAsync();
+        var hotels = await context.Hotels.AsNoTracking().ToListAsync();
+        return mapper.Map<List<GetHotelsDto>>(hotels);
     }
 
     public async Task<GetHotelDto?> GetHotelAsync(int id)
     {
-        return await context.Hotels
+        var hotel = await context
+            .Hotels.Where(hotel => hotel.Id == id)
+            .Include(hotel => hotel.Country)
             .AsNoTracking()
-            .Where(hotel => hotel.Id == id)
-            .Select(hotel => new GetHotelDto(
-                hotel.Id, hotel.Name!, hotel.Address, hotel.Rating,
-                hotel.Country!.Name!, hotel.Country.ShortName))
             .FirstOrDefaultAsync();
+        return hotel is null ? null : mapper.Map<GetHotelDto>(hotel);
     }
 
     public async Task<GetHotelDto> CreateHotelAsync(CreateHotelDto hotelDto)
     {
-        var hotel = new Hotel
-        {
-            Name = hotelDto.Name,
-            Address = hotelDto.Address,
-            Rating = hotelDto.Rating,
-            CountryId = hotelDto.CountryId
-        };
+        var hotel = mapper.Map<Hotel>(hotelDto);
 
         context.Hotels.Add(hotel);
         await context.SaveChangesAsync();
@@ -52,10 +43,7 @@ public class HotelsService(HotelListingDbContext context) : IHotelsService
             return false;
         }
 
-        hotel.Name = hotelDto.Name;
-        hotel.Address = hotelDto.Address;
-        hotel.Rating = hotelDto.Rating;
-        hotel.CountryId = hotelDto.CountryId;
+        mapper.Map(hotelDto, hotel);
         await context.SaveChangesAsync();
         return true;
     }

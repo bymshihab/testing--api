@@ -1,48 +1,36 @@
+using AutoMapper;
 using HoteListing.Api.Data;
-using HoteListing.Api.DTOs.Hotel;
 using HotelListing.Api.Contracts;
 using HotelListing.Api.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.Api.Services;
 
-public class CountriesService(HotelListingDbContext context) : ICountriesService
+public class CountriesService(HotelListingDbContext context, IMapper mapper) : ICountriesService
 {
     public async Task<IEnumerable<GetCountriesDto>> GetCountriesAsync()
     {
-        return await context.Countries
-            .AsNoTracking()
-            .Select(country => new GetCountriesDto(
-                country.Name!, country.ShortName!, country.CountryId))
-            .ToListAsync();
+        var countries = await context.Countries.AsNoTracking().ToListAsync();
+        return mapper.Map<List<GetCountriesDto>>(countries);
     }
 
     public async Task<GetCountryDto?> GetCountryAsync(int id)
     {
-        return await context.Countries
+        var country = await context.Countries
             .AsNoTracking()
-            .Where(country => country.CountryId == id)
-            .Select(country => new GetCountryDto(
-                country.CountryId,
-                country.Name!,
-                country.ShortName!,
-                country.Hotels!.Select(hotel => new GetHotelSlimDto(
-                    hotel.Id, hotel.Name!, hotel.Address, hotel.Rating)).ToList()))
-            .FirstOrDefaultAsync() ?? null;
+            .Include(country => country.Hotels)
+            .FirstOrDefaultAsync(country => country.CountryId == id);
+        return country is null ? null : mapper.Map<GetCountryDto>(country);
     }
 
     public async Task<GetCountryDto> CreateCountryAsync(CreateCountryDto countryDto)
     {
-        var country = new Country
-        {
-            Name = countryDto.Name,
-            ShortName = countryDto.ShortName
-        };
+        var country = mapper.Map<Country>(countryDto);
 
         context.Countries.Add(country);
         await context.SaveChangesAsync();
 
-        return new GetCountryDto(country.CountryId, country.Name!, country.ShortName!, []);
+        return mapper.Map<GetCountryDto>(country);
     }
 
     public async Task<bool> UpdateCountryAsync(int id, UpdateCountryDto countryDto)
@@ -53,8 +41,7 @@ public class CountriesService(HotelListingDbContext context) : ICountriesService
             return false;
         }
 
-        country.Name = countryDto.Name;
-        country.ShortName = countryDto.ShortName;
+        mapper.Map(countryDto, country);
         await context.SaveChangesAsync();
         return true;
     }
