@@ -30,6 +30,9 @@ Next Course:
 - Entity framework course
 
 ```
-dotnet restore
-dotnet run --launch-profile http
+
+
 ```
+## API Security: 
+install Package: 
+`Microsoft.AspNetCore.Identity.EntityFramWorkCore`
