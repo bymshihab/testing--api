@@ -220,3 +220,4 @@
 /tmp/hotelrun-build/HotelListing.Api.runtimeconfig.json
 /tmp/hotelrun-build/HotelListing.Api.dll
 /tmp/hotelrun-build/HotelListing.Api.pdb
+/home/klovercloud/Resouces/dotNet/practrice-code/HotelListing.Api/HotelListing.Api/bin/Debug/net10.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
