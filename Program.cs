@@ -31,9 +31,12 @@ builder.Services.AddScoped<ICountriesService>(provider => provider.GetRequiredSe
 builder.Services.AddScoped<IHotelsService, HotelsService>();
 builder.Services.AddTransient<CountryNameResolver>();
 
-builder.Services.AddIdentityCore<IdentityUser>(options =>{})
+builder.Services.AddDataProtection();
+
+builder.Services.AddIdentityCore<ApplicationUser>(options =>{})
     .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<HotelListingDbContext>();
+    .AddEntityFrameworkStores<HotelListingDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddAutoMapper(cfg =>
 {
@@ -44,12 +47,6 @@ builder.Services.AddAutoMapper(cfg =>
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<HotelListingDbContext>();
-    dbContext.Database.EnsureCreated();
-}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

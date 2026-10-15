@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.Api.Data;
 
-public class HotelListingDbContext : IdentityDbContext<IdentityUser> // Represents the database context for the Hotel Listing application. It inherits from the DbContext class provided by Entity Framework Core, which is an Object-Relational Mapping (ORM) framework for .NET applications. The DbContext class provides methods and properties to interact with the database, such as querying and saving data.
+public class HotelListingDbContext : IdentityDbContext<ApplicationUser> // Represents the database context for the Hotel Listing application. It inherits from the DbContext class provided by Entity Framework Core, which is an Object-Relational Mapping (ORM) framework for .NET applications. The DbContext class provides methods and properties to interact with the database, such as querying and saving data.
 {
     public HotelListingDbContext(DbContextOptions<HotelListingDbContext> options) : base(options) // Constructor that takes DbContextOptions and passes it to the base DbContext class. This allows configuration of the database context, such as specifying the database provider and connection string.
     {
