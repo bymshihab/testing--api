@@ -38,6 +38,11 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>{})
     .AddEntityFrameworkStores<HotelListingDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
+                .AddEntityFrameworkStores<HotelListingDbContext>();    
+builder.Services.AddAuthorization();
+
+
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<CountryMappingProfile>();
@@ -47,6 +52,8 @@ builder.Services.AddAutoMapper(cfg =>
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+app.MapIdentityApi<ApplicationUser>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

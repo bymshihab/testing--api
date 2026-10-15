@@ -8,3 +8,4 @@ public class ApplicationUser : IdentityUser // Represents a user in the applicat
     public string LastName { get; set; } = string.Empty; // Property to store the user's last name.
 }
 
+ 
