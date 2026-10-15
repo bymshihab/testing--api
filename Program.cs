@@ -2,6 +2,7 @@ using HotelListing.Api.Contracts;
 using HotelListing.Api.Data;
 using HotelListing.Api.Mapping;
 using HotelListing.Api.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +30,10 @@ builder.Services.AddScoped<CountriesService>();
 builder.Services.AddScoped<ICountriesService>(provider => provider.GetRequiredService<CountriesService>());
 builder.Services.AddScoped<IHotelsService, HotelsService>();
 builder.Services.AddTransient<CountryNameResolver>();
+
+builder.Services.AddIdentityCore<IdentityUser>(options =>{})
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<HotelListingDbContext>();
 
 builder.Services.AddAutoMapper(cfg =>
 {
