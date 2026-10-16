@@ -4,31 +4,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HotelListing.Api.Controllers;
 
-[Route("api/[controller]")]
-[ApiController]
-public class CountriesController(ICountriesService countriesService) : ControllerBase
+public class CountriesController(ICountriesService countriesService) : BaseApiController
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetCountriesDto>>> GetCountries()
     {
         var result = await countriesService.GetCountriesAsync();
-        return result.IsSuccess ? Ok(result.Value) : result.ToErrorResponse(this);
+        return FromResult(result);
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<GetCountryDto>> GetCountry(int id)
     {
         var result = await countriesService.GetCountryAsync(id);
-        return result.IsSuccess ? Ok(result.Value) : result.ToErrorResponse(this);
+        return FromResult(result);
     }
 
     [HttpPost]
     public async Task<ActionResult<GetCountryDto>> PostCountry(CreateCountryDto countryDto)
     {
         var result = await countriesService.CreateCountryAsync(countryDto);
-        return result.IsSuccess
-            ? CreatedAtAction(nameof(GetCountry), new { id = result.Value!.Id }, result.Value)
-            : result.ToErrorResponse(this);
+        return FromCreatedResult(result, nameof(GetCountry), country => new { id = country.Id });
     }
 
     [HttpPut("{id:int}")]
@@ -40,13 +36,13 @@ public class CountriesController(ICountriesService countriesService) : Controlle
         }
 
         var result = await countriesService.UpdateCountryAsync(id, countryDto);
-        return result.IsSuccess ? NoContent() : result.ToErrorResponse(this);
+        return FromNoContentResult(result);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteCountry(int id)
     {
         var result = await countriesService.DeleteCountryAsync(id);
-        return result.IsSuccess ? NoContent() : result.ToErrorResponse(this);
+        return FromNoContentResult(result);
     }
 }

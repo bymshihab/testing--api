@@ -5,31 +5,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HotelListing.Api.Controllers;
 
-[Route("api/[controller]")]
-[ApiController]
-public class HotelsController(IHotelsService hotelsService) : ControllerBase
+public class HotelsController(IHotelsService hotelsService) : BaseApiController
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetHotelsDto>>> GetHotels()
     {
         var result = await hotelsService.GetHotelsAsync();
-        return result.IsSuccess ? Ok(result.Value) : result.ToErrorResponse(this);
+        return FromResult(result);
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<GetHotelDto>> GetHotel(int id)
     {
         var result = await hotelsService.GetHotelAsync(id);
-        return result.IsSuccess ? Ok(result.Value) : result.ToErrorResponse(this);
+        return FromResult(result);
     }
 
     [HttpPost]
     public async Task<ActionResult<GetHotelDto>> PostHotel(CreateHotelDto hotelDto)
     {
         var result = await hotelsService.CreateHotelAsync(hotelDto);
-        return result.IsSuccess
-            ? CreatedAtAction(nameof(GetHotel), new { id = result.Value!.Id }, result.Value)
-            : result.ToErrorResponse(this);
+        return FromCreatedResult(result, nameof(GetHotel), hotel => new { id = hotel.Id });
     }
 
     [HttpPut("{id:int}")]
@@ -41,13 +37,13 @@ public class HotelsController(IHotelsService hotelsService) : ControllerBase
         }
 
         var result = await hotelsService.UpdateHotelAsync(id, hotelDto);
-        return result.IsSuccess ? NoContent() : result.ToErrorResponse(this);
+        return FromNoContentResult(result);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteHotel(int id)
     {
         var result = await hotelsService.DeleteHotelAsync(id);
-        return result.IsSuccess ? NoContent() : result.ToErrorResponse(this);
+        return FromNoContentResult(result);
     }
 }
