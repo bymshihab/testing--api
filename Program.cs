@@ -2,6 +2,7 @@ using HotelListing.Api.Contracts;
 using HotelListing.Api.Data;
 using HotelListing.Api.Mapping;
 using HotelListing.Api.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,22 +28,37 @@ builder
     });
 
 builder.Services.AddScoped<CountriesService>();
-builder.Services.AddScoped<ICountriesService>(provider => provider.GetRequiredService<CountriesService>());
+builder.Services.AddScoped<ICountriesService>(provider =>
+    provider.GetRequiredService<CountriesService>()
+);
 builder.Services.AddScoped<IHotelsService, HotelsService>();
 builder.Services.AddScoped<IUserService, UsersService>();
 builder.Services.AddTransient<CountryNameResolver>();
 
 builder.Services.AddDataProtection();
 
-builder.Services.AddIdentityCore<ApplicationUser>(options =>{})
+builder
+    .Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = AuthenticationDefaults.BasicScheme;
+        options.DefaultChallengeScheme = AuthenticationDefaults.BasicScheme;
+    })
+    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(
+        AuthenticationDefaults.BasicScheme,
+        _ => { }
+    );
+;
+
+builder
+    .Services.AddIdentityCore<ApplicationUser>(options => { })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<HotelListingDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
-                .AddEntityFrameworkStores<HotelListingDbContext>();    
+builder
+    .Services.AddIdentityApiEndpoints<ApplicationUser>()
+    .AddEntityFrameworkStores<HotelListingDbContext>();
 builder.Services.AddAuthorization();
-
 
 builder.Services.AddAutoMapper(cfg =>
 {
