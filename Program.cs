@@ -29,6 +29,7 @@ builder
 builder.Services.AddScoped<CountriesService>();
 builder.Services.AddScoped<ICountriesService>(provider => provider.GetRequiredService<CountriesService>());
 builder.Services.AddScoped<IHotelsService, HotelsService>();
+builder.Services.AddScoped<IUserService, UsersService>();
 builder.Services.AddTransient<CountryNameResolver>();
 
 builder.Services.AddDataProtection();

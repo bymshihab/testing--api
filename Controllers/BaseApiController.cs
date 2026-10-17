@@ -7,7 +7,7 @@ namespace HotelListing.Api.Controllers;
 [Route("api/[controller]")]
 public abstract class BaseApiController : ControllerBase
 {
-    protected ActionResult<T> FromResult<T>(Result<T> result)
+    protected ActionResult<T> ToActionResult<T>(Result<T> result)
     {
         return result.IsSuccess ? Ok(result.Value) : ErrorResponse(result.Errors);
     }

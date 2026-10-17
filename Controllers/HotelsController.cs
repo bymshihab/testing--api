@@ -11,14 +11,14 @@ public class HotelsController(IHotelsService hotelsService) : BaseApiController
     public async Task<ActionResult<IEnumerable<GetHotelsDto>>> GetHotels()
     {
         var result = await hotelsService.GetHotelsAsync();
-        return FromResult(result);
+        return ToActionResult(result);
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<GetHotelDto>> GetHotel(int id)
     {
         var result = await hotelsService.GetHotelAsync(id);
-        return FromResult(result);
+        return ToActionResult(result);
     }
 
     [HttpPost]

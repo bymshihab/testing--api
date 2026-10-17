@@ -10,14 +10,14 @@ public class CountriesController(ICountriesService countriesService) : BaseApiCo
     public async Task<ActionResult<IEnumerable<GetCountriesDto>>> GetCountries()
     {
         var result = await countriesService.GetCountriesAsync();
-        return FromResult(result);
+        return ToActionResult(result);
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<GetCountryDto>> GetCountry(int id)
     {
         var result = await countriesService.GetCountryAsync(id);
-        return FromResult(result);
+        return ToActionResult(result);
     }
 
     [HttpPost]
