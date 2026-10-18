@@ -3,6 +3,7 @@ using HotelListing.Api.Data;
 using HotelListing.Api.Mapping;
 using HotelListing.Api.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,8 +41,23 @@ builder.Services.AddDataProtection();
 builder
     .Services.AddAuthentication(options =>
     {
-        options.DefaultAuthenticateScheme = AuthenticationDefaults.BasicScheme;
-        options.DefaultChallengeScheme = AuthenticationDefaults.BasicScheme;
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["jwtSettings:Issuer"],
+            ValidAudience = builder.Configuration["jwtSettings:Audience"],
+            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["jwtSettings:Key"]!)),
+            ClockSkew = TimeSpan.Zero // Disable clock skew to ensure tokens expire exactly at token expiration time (instead of 5 minutes later)
+        };
     })
     .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(
         AuthenticationDefaults.BasicScheme,
@@ -59,7 +75,6 @@ builder
     .Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddEntityFrameworkStores<HotelListingDbContext>();
 builder.Services.AddAuthorization();
-
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<CountryMappingProfile>();
