@@ -9,6 +9,17 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var jwtKey = builder.Configuration["jwtSettings:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey) || System.Text.Encoding.UTF8.GetByteCount(jwtKey) < 32)
+{
+    throw new InvalidOperationException("jwtSettings:Key must be at least 32 bytes for HS256.");
+}
+
+if (builder.Configuration.GetValue<int>("jwtSettings:DurationInMinutes") <= 0)
+{
+    throw new InvalidOperationException("jwtSettings:DurationInMinutes must be greater than zero.");
+}
+
 // Add services to the IOC container.
 builder.Services.AddControllers();
 
@@ -55,7 +66,7 @@ builder
             ValidIssuer = builder.Configuration["jwtSettings:Issuer"],
             ValidAudience = builder.Configuration["jwtSettings:Audience"],
             IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["jwtSettings:Key"]!)),
+                System.Text.Encoding.UTF8.GetBytes(jwtKey)),
             ClockSkew = TimeSpan.Zero // Disable clock skew to ensure tokens expire exactly at token expiration time (instead of 5 minutes later)
         };
     })
@@ -95,6 +106,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
